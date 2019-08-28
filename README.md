@@ -5,6 +5,11 @@ This repo contains all of the backend logic for my new course planning app (fina
 All resources are stored under the `functions/` folder.
 
 
+## Reference
+
+I'm not an expert in GraphQL, so I've been using this blog as a rough guide: https://www.robinwieruch.de/graphql-apollo-server-tutorial
+
+
 ## Testing and Deploy
 To test locally, run
 ```

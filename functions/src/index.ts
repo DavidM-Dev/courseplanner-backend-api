@@ -1,6 +1,7 @@
 import * as functions from 'firebase-functions';
+import { configureServer } from "./server";
 
+const server = configureServer();
+const api = functions.https.onRequest(server);
 
-export const helloWorld = functions.https.onRequest((request, response) => {
- response.send("Hello from Firebase!");
-});
+module.exports = { api };

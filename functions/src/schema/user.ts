@@ -1,6 +1,10 @@
 import { gql } from 'apollo-server-express';
 
 const userSchema = gql`
+  extend type Query {
+    user: User
+  }
+
   type User {
     id: ID!,
     firstName: String!,
@@ -10,18 +14,18 @@ const userSchema = gql`
     "A list of the user's academic plans"
     plans: [FullPlan],
     "Create a new plan, from scratch"
-    createEmptyPlan(): FullPlan,
+    createEmptyPlan: FullPlan,
     "Copy someone else's plan into your saved plans so that you can edit it"
-    clonePlan(id: ID!): FullPlan,
+    clonePlan(id: ID): FullPlan,
     "Removes a plan. Returns true if successful"
-    removePlan(id: ID!): Boolean,
+    removePlan(id: ID): Boolean,
 
     "A list of the user's currently enrolled programs. (FullPlan.programs takes priority)"
     programs: [Program],
     "Appends a program to the end of the list"
-    addProgram(id: ID!): Program,
+    addProgram(id: ID): Program,
     "Removes a program from the list. Returns true if successful"
-    removeProgram(id: ID!): Boolean
+    removeProgram(id: ID): Boolean
 
     """
     The user's co-op sequence, or just the schedule in which they plan to take study terms.
@@ -32,11 +36,14 @@ const userSchema = gql`
     modifySequence(sequence: [String]): [String]
   }
 `
-const userResolvers = {
-  User: (obj, args, context) => {
-    // TODO
+
+const userResolver = {
+  Query: {
+    
+  },
+  User: {
+    firstName: () => 'first'
   }
 }
 
-
-export default { userSchema, userResolvers }
+export { userSchema, userResolver };

@@ -1,0 +1,157 @@
+# || This document is just for brainstorming, this may or may not be the schema that I decide on ||
+
+type User {
+  id: ID!,
+  firstName: String!,
+  lastName: String,
+  email: String!,
+
+  "A list of the user's academic plans"
+  plans: [FullPlan],
+  "Create a new plan, from scratch"
+  createEmptyPlan(): FullPlan,
+  "Copy someone else's plan into your saved plans so that you can edit it"
+  clonePlan(id: ID!): FullPlan,
+  "Removes a plan. Returns true if successful"
+  removePlan(id: ID!): Boolean,
+
+  "A list of the user's currently enrolled programs. (FullPlan.programs takes priority)"
+  programs: [Program],
+  "Appends a program to the end of the list"
+  addProgram(id: ID!): Program,
+  "Removes a program from the list. Returns true if successful"
+  removeProgram(id: ID!): Boolean
+
+  """
+  The user's co-op sequence, or just the schedule in which they plan to take study terms.
+  "STUDY" represents a study term, "WORK" represents a work term, "CHILL" represents a chill term.
+  (FullPlan.sequence takes priority)
+  """
+  sequence: [String],
+  modifySequence(sequence: [String]): [String]
+}
+
+
+"""
+A list of courses that a user plans to take in a certain order, organized by terms.
+"""
+type FullPlan {
+  id: ID!,
+  author: User,
+  "The number of users that have copied (forked) this plan"
+  numForks: Int,
+  "The programs for which this plan should cover requirements"
+  programs: [Program],
+  "The individual terms within the full plan"
+  terms: [TermPlan],
+  """
+  The user's co-op sequence, or just the schedule in which they plan to take study terms.
+  "STUDY" represents a study term, "WORK" represents a work term, "CHILL" represents a chill term.
+  """
+  sequence: [String]
+}
+
+"""
+A list of courses that the user plans to take in a single term.
+"""
+type TermPlan {
+  "The individual courses within the term"
+  courses: [CoursePlan],
+  "The name of the term (e.g. 'Fall 2019', 'Winter 2020')"
+  termName: String,
+  "The name of the term relative to the user (e.g. 4A, 2B, etc.)"
+  userTermName: String,
+  "The index of the term in the FullPlan wrapper"
+  index: Int
+}
+
+"""
+A wrapper for a specific course, that contains all the user's plan metadata for that course.
+"""
+type CoursePlan {
+  course: Course,
+  "Any notes that the user has about the course"
+  notes: String,
+  "The index of the course in the TermPlan wrapper"
+  index: Int
+}
+
+"""
+An academic program, such as "Honours BMath, Co-Op"; or "BCS Data Science Option"
+"""
+type Program {
+  id: ID!,
+  author: User,
+  university: String,
+  requirements: [Requirement]
+}
+
+"""
+There are two general types of requirements:
+1) Take N courses from [X, Y, Z]
+2) Take all courses from [X, Y, Z]
+
+The condition is usually:
+1) Take {courses above} before a specific term number (e.g. 4A -> 7)
+
+Each set of courses can be represented by a single course code, a range of course codes,
+or any kind of elective (we should use regex-ish expressions).
+"""
+type Requirement {  
+  "An optional string describing the requirement details"
+  description: String,
+  "The courses which need to be completed. This could be a range of courses, so these strings are represented as regex-ish expressions."
+  coursesAffected: [String],
+  "The number of courses which need to be fulfilled from the coursesAffected list, before the condition is complete. -1 represents all of the courses"
+  numCoursesAffected: Int,
+  "The term number by which this needs to be completed. Null value means that it needs to be completed before graduation"
+  completedBy: Int  
+}
+
+type Course {
+  "The full course title (e.g. 'Logic and Computation (Enriched)')"
+  title: String,
+  "The course code, with appropriate spacing (e.g. 'CS 245E')"
+  courseCode: String,
+  "The first part of the course code (e.g. 'CS')"
+  courseCategory: String,
+  "The second part of the course code (e.g. '245E')"
+  courseNum: String, 
+  "The url to the course calendar entry for this course"
+  calendarUrl: String,
+
+  # TODO: probably need a lot more stuff here
+  
+  "The seasons that this course is usually offered (F/W/S)"
+  termsUsuallyOffered: [String],
+  "The terms when we *know* it will be offered (e.g. 'Fall 2019', 'Winter 2020')"
+  termsActuallyOffered: [String]
+}
+
+
+
+# Some of this stuff will probably need to be added later on:
+
+# || Long-Term View ||
+
+# When you change your schedule, as much of that validation as possible should happen on the client side (seamless).
+# *  Ensuring that the prerequisite order is conserved
+# *  Ensuring that you're still going to meet your program requirements
+# *  Ensuring that there are no time conflicts (if that data is available - could be null)
+
+# Further validation can be done server-side:
+# *  (can't think of any right now)
+
+# Users should be able to check a catalogue to search for new courses they might like
+
+# || Short-Term View ||
+# This may end up being tightly coupled with the Long-Term View in the future.
+
+# This should be able to display your timetable for the current/upcoming term.
+# *  The number of spaces available in a course
+# *  The different sections in a course <-- [looks hard]
+#     *  The prof
+#     *  The lecture/tutorial times
+
+
+

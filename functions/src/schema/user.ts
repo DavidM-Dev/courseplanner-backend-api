@@ -2,14 +2,20 @@ import { gql } from 'apollo-server-express';
 
 const userSchema = gql`
   extend type Query {
-    user: User
+    getUser(id: ID): User,
+    getMyInfo: User
+  }
+
+  extend type Mutation {
+    createUser(id: ID, firstName: String, email: String): User
   }
 
   type User {
     id: ID!,
-    firstName: String!,
+    firstName: String,
     lastName: String,
-    email: String!,
+    email: String,
+    token: String,
 
     "A list of the user's academic plans"
     plans: [FullPlan],
@@ -32,17 +38,17 @@ const userSchema = gql`
     "STUDY" represents a study term, "WORK" represents a work term, "CHILL" represents a chill term.
     (FullPlan.sequence takes priority)
     """
-    sequence: [String],
+    sequence: [String], # TODO: this should be an enum, not a string
     modifySequence(sequence: [String]): [String]
   }
 `
 
 const userResolver = {
   Query: {
-    
-  },
-  User: {
-    firstName: () => 'first'
+    getUser: async (_1: any, _2: any, { db }: { db: FirebaseFirestore.Firestore }) => {
+      let res = await db.collection('users').doc('06hknymIo4H91O0n71ix').get();
+      return { id: 'id-test', ...res};
+    }
   }
 }
 

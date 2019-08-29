@@ -2,7 +2,7 @@ import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import { typeDefs, resolvers } from './schema';
 import cors from 'cors';
-
+import * as admin from 'firebase-admin';
 
 function configureServer() {
   const app = express();
@@ -10,7 +10,11 @@ function configureServer() {
 
   const server = new ApolloServer({
     typeDefs,
-    resolvers
+    resolvers,
+    context: () => {
+      let db = admin.firestore();
+      return { db }
+    }
   });
   server.applyMiddleware({ app });
 
@@ -18,4 +22,3 @@ function configureServer() {
 }
 
 export { configureServer };
-

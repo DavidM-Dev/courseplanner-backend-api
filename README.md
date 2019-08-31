@@ -25,5 +25,5 @@ cd functions
 firebase login
 firebase deploy
 ```
-You can then send all queries to https://us-central1-courseplanner-app.cloudfunctions.net/api/graphql (no graphql playground available, unfortunately 😔).
+You can then send all queries to https://us-central1-courseplanner-app.cloudfunctions.net/api/graphql (do NOT use the graphql playground on that URL -- that's basically just burning money).
 
